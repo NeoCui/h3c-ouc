@@ -220,6 +220,7 @@ void getdev()
         }
 }
 
+//Check process
 int checkprocess()
 {
     char command[]="ps -e|grep -w h3c_ouc";
