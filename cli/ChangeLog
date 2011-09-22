@@ -1,2 +1,8 @@
 2011-09-22 Jiakun Huang <huangjiakun1991@gmail.com>
-          *程序第一次正式发布
+	*添加ChangeLog以及README文件
+	*完善Makefile
+	*h3c_ouc.c中的gets函数改为fgets，避免了堆栈溢出的警告
+
+2011-09-21 Jiakun Huang <huangjiakun1991@gmail.com>
+	*程序第一次正式发布
+	

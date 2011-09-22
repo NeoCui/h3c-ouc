@@ -179,7 +179,7 @@ void getuname()
      username=(char *)malloc(100);
      GetUname:
      printf("Please Input UserName:");
-     gets(username);
+     fgets(username,sizeof(username),stdin);
      if(strlen(username)==0)
         {
          printf("Username can't be empty!\n");
@@ -196,7 +196,7 @@ void getpwd()
      GetPwd:
      printf("Please Input Password:");
      password=(char *)malloc(100);
-     gets(password);
+     fgets(password,sizeof(password),stdin);
      if(strlen(password)==0)
          {
          printf("Password can't be empty!\n");
@@ -216,7 +216,7 @@ void getdev()
      temp=(char *)malloc(100);
      devicename=(char *)malloc(100);
      printf("Please Input Devicename(default for eth0):");
-     gets(temp);
+     fgets(temp,sizeof(temp),stdin);
      if(strlen(temp)==0)
         strcpy(devicename,DefaultDevName);
      else if(strlen(temp)!=4)
