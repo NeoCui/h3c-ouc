@@ -141,7 +141,7 @@ int main(int argc,char *argv[])
                  devicename=(char *)malloc(100); 
                  strcpy(devicename,argv[optind]);
               }
-              printf("devicename:%s.\n",devicename);
+              printf("DeviceName:%s.\n",devicename);
               SendLogoffPkt(devicename);
               exit(0);
               break;
@@ -159,7 +159,7 @@ int main(int argc,char *argv[])
 
         } 
     else
-             printf("Username & Password & Devicename can not be empty!\n");
+             printf("UserName & Password & DeviceName can not be empty!\n");
 
     exit(1);
     
@@ -179,15 +179,15 @@ void getuname()
      username=(char *)malloc(100);
      GetUname:
      printf("Please Input UserName:");
-     fgets(username,sizeof(username),stdin);
+     gets(username);
      if(strlen(username)==0)
         {
-         printf("Username can't be empty!\n");
+         printf("UserName can't be empty!\n");
          goto GetUname;
         }
      if(strlen(username)>100)
         {
-         printf("Username is too long");
+         printf("UserName is too long");
          goto GetUname;
         }
 }
@@ -196,7 +196,7 @@ void getpwd()
      GetPwd:
      printf("Please Input Password:");
      password=(char *)malloc(100);
-     fgets(password,sizeof(password),stdin);
+     gets(password);
      if(strlen(password)==0)
          {
          printf("Password can't be empty!\n");
@@ -204,7 +204,7 @@ void getpwd()
          }
       if(strlen(password)>100)
         {
-         printf("Username is too long");
+         printf("UserName is too long");
          goto GetPwd;
         }
 }
@@ -215,13 +215,13 @@ void getdev()
      GetDevicename:      
      temp=(char *)malloc(100);
      devicename=(char *)malloc(100);
-     printf("Please Input Devicename(default for eth0):");
-     fgets(temp,sizeof(temp),stdin);
+     printf("Please Input DeviceName(default for eth0):");
+     gets(temp);
      if(strlen(temp)==0)
         strcpy(devicename,DefaultDevName);
      else if(strlen(temp)!=4)
         {
-         printf("Devicename Error!\n");
+         printf("DeviceName Error!\n");
          goto GetDevicename;
         }
      else

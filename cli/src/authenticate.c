@@ -65,6 +65,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 serverIsFound = true;
             else
             {	// 延时后重试
+                printf("Waiting for response......\n");
                 if(flag>1)
                    {
                    printf("Server no response.\n");
@@ -364,7 +365,7 @@ void SendLogoffPkt(char *DeviceName)
     packet[16] = packet[17] =0x00;// Length=0x0000
 
     // 发包
-    printf("Logoff......\n");
+    printf("Logoff.\n");
     pcap_sendpacket(adhandle, packet, sizeof(packet));
     exit(0);
 }
