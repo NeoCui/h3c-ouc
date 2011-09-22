@@ -15,7 +15,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
     uint8_t	MAC[6];
     char	FilterStr[100];
     struct bpf_program	fcode;
-    const int DefaultTimeout=60000;//设置接收超时参数，单位ms
+    const int DefaultTimeout=3000;//设置接收超时参数，单位ms
 
     // 检查网线是否已插好,网线插口可能接触不良
     if(GetNetState(DeviceName)==-1)
@@ -65,12 +65,12 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 serverIsFound = true;
             else
             {	// 延时后重试
-                if(flag>30)
+                if(flag>1)
                    {
                    printf("Server no response.\n");
                    exit(1);
                    }
-                sleep(1); printf(".");
+                sleep(1); 
                 flag++;
                 SendStartPkt(adhandle, MAC);
                 // NOTE: 这里没有检查网线是否接触不良或已被拔下

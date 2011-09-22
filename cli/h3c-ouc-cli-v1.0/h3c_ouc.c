@@ -23,9 +23,20 @@ void getdev();
 //主函数
 int main(int argc,char *argv[])
 {
-   int count=0,i;
+   int c=0,i,j;
    int opt;
    opterr = 0;
+   for(i=0;i<argc;i++)
+     {
+      for(j=0;j<strlen(argv[i]);j++)
+        if(argv[i][j]=='-')
+          c++;
+     }
+   if(c<argc/2)
+     {
+      printf("参数前面必须有选项！\n请尝试执行“h3c_ouc --help”来获取更多信息。\n");
+      exit(1);
+     }
    struct option long_options[]={
        	{"help",0,NULL,'h'},
 	{"username",1,NULL,'u'},
@@ -45,9 +56,9 @@ int main(int argc,char *argv[])
 	      print_help();
               exit(1);
 	}
+   
     while((opt=getopt_long(argc,argv,options,long_options,NULL))!=-1)
     {
-      
 	switch(opt)
        {
              case 'u':
@@ -138,10 +149,9 @@ int main(int argc,char *argv[])
               printf("未识别的选项!\n请尝试执行“h3c_ouc --help”来获取更多信息。\n");
               exit(1);
               break;
-            
           }
         }
-    
+       
     if((strlen(username)!=0)&&(strlen(password)!=0)&&(strlen(devicename)!=0))
         {
                 Authentication(username,password,devicename);
@@ -220,7 +230,6 @@ void getdev()
         }
 }
 
-//检测进程
 int checkprocess()
 {
     char command[]="ps -e|grep -w h3c_ouc";
