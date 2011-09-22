@@ -1,0 +1,19 @@
+README
+======
+h3c-ouc是适用于中国海洋大学宿舍区的h3c UNIX/Linux 下上网客户端，主要依赖 libpcap 和 libgcrypt 库。
+
+CONTACT
+=======
+如果您对我们的代码或者对我们以后的版本有什么建议，请联系我们的邮箱 huangjiakun1991@gmail.com 或 guo.toland@gmail.com。
+
+WEBSITE
+=======
+我们的项目网站：http://code.google.com/p/h3c-ouc，其中提供源代码下载。
+
+INSTALLATION
+============
+编译前确保已经安装库：libpcap，libgcrypt。如果没有安装，请执行：
+$ apt-get install libpcap-dev
+$ apt-get install libgcrypt-dev
+进入源代码目录，执行：
+$ make
