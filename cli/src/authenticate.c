@@ -74,7 +74,12 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 sleep(1); 
                 flag++;
                 SendStartPkt(adhandle, MAC);
-                // NOTE: 这里没有检查网线是否接触不良或已被拔下
+                if(GetNetState(DeviceName)==-1)
+                 {
+                  fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+                  exit(1);
+                 }
+                // 检查网线是否接触不良或已被拔下
             }
         }
 
@@ -116,9 +121,13 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
             // 调用pcap_next_ex()函数捕获数据包
             while (pcap_next_ex(adhandle, &header, &captured) != 1)
             {
-                printf("."); // 若捕获失败，则等1秒后重试
                 sleep(1);     // 直到成功捕获到一个数据包后再跳出
-                // NOTE: 这里没有检查网线是否已被拔下或插口接触不良
+            if(GetNetState(DeviceName)==-1)
+             {
+              fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+              exit(1);
+             }
+                // 检查网线是否已被拔下或插口接触不良
             }
 
             // 根据收到的Request，回复相应的Response包

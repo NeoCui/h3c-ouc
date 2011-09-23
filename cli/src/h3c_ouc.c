@@ -11,8 +11,7 @@
    char *password;
    char *devicename;
 
-//检测网络链路
-int GetNetState();
+
 //检测进程
 int checkprocess();
 
@@ -45,11 +44,6 @@ int main(int argc,char *argv[])
 	{"logoff",1,NULL,'l'},       
 	{NULL,0,NULL,0},
     };
-    if(checkprocess()==-1)
-       {
-       printf("A process is already running!\n");
-       exit(1);
-       }
     static const char *options="u::p::n::l::h";
     if(argc==1)
 	{
@@ -62,6 +56,11 @@ int main(int argc,char *argv[])
 	switch(opt)
        {
              case 'u':
+             if(checkprocess()==-1)
+             {
+              printf("A process is already running!\n");
+              exit(1);
+             }
               if(argv[optind]==NULL)
 		  {
                   getuname();
@@ -85,6 +84,11 @@ int main(int argc,char *argv[])
 	      break;
               
              case 'p':
+                if(checkprocess()==-1)
+                {
+                printf("A process is already running!\n");
+                exit(1);
+                }
                 if(username==NULL)
                     {
                     getuname();
@@ -110,6 +114,11 @@ int main(int argc,char *argv[])
               break;
 	      
              case 'n':
+               if(checkprocess()==-1)
+                {
+                printf("A process is already running!\n");
+                exit(1);
+                }
                if(username==NULL)
                     {
                     getuname();
