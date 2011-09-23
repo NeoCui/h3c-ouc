@@ -212,7 +212,7 @@ void getpwd()
 void getdev()
 {
   char *temp;  
-     GetDevicename:      
+     GetDeviceName:      
      temp=(char *)malloc(100);
      devicename=(char *)malloc(100);
      printf("Please Input DeviceName(default for eth0):");
@@ -222,7 +222,7 @@ void getdev()
      else if(strlen(temp)!=4)
         {
          printf("DeviceName Error!\n");
-         goto GetDevicename;
+         goto GetDeviceName;
         }
      else
         {
