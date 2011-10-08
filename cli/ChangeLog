@@ -1,3 +1,9 @@
+2011-10-08 Jiakun Huang <huangjiakun1991@gmail.com>
+	*输出信息全部改成中文
+	*增加socket()函数的空间释放
+	*增加ioctl()函数的异常处理
+	*读取用户名、密码和网卡名称的函数由gets()改成fgets()
+
 2011-09-22 Jiakun Huang <huangjiakun1991@gmail.com>
 	*修复不能注销的BUG
 

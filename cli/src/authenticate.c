@@ -15,12 +15,12 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
     uint8_t	MAC[6];
     char	FilterStr[100];
     struct bpf_program	fcode;
-    const int DefaultTimeout=3000;//设置接收超时参数，单位ms
+    const int DefaultTimeout=1000;//设置接收超时参数，单位ms
 
     // 检查网线是否已插好,网线插口可能接触不良
     if(GetNetState(DeviceName)==-1)
        {
-       fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+       fprintf(stderr, "%s\n", "网卡异常！请检查网卡名称是否正确，网线是否插好！");
        exit(1);
        }
     /* 打开适配器(网卡) */
@@ -65,10 +65,10 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 serverIsFound = true;
             else
             {	// 延时后重试
-                printf("Waiting for response......\n");
-                if(flag>1)
+                printf("等待服务器响应......\n");
+                if(flag>3)
                    {
-                   printf("Server no response.\n");
+                   printf("服务器未响应。\n");
                    exit(1);
                    }
                 sleep(1); 
@@ -76,7 +76,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 SendStartPkt(adhandle, MAC);
                 if(GetNetState(DeviceName)==-1)
                  {
-                  fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+                  fprintf(stderr, "%s\n", "网卡异常！请检查网卡名称是否正确，网线是否插好！");
                   exit(1);
                  }
                 // 检查网线是否接触不良或已被拔下
@@ -113,7 +113,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
        {
        if(GetNetState(DeviceName)==-1)
        {
-       fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+       fprintf(stderr, "%s\n", "网卡异常！请检查网卡名称是否正确，网线是否插好！");
        exit(1);
        }
         for (;;)
@@ -124,7 +124,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 sleep(1);     // 直到成功捕获到一个数据包后再跳出
             if(GetNetState(DeviceName)==-1)
              {
-              fprintf(stderr, "%s\n", "No active Network!Please check the Network!");
+              fprintf(stderr, "%s\n", "网卡异常！请检查网卡名称是否正确，网线是否插好！");
               exit(1);
              }
                 // 检查网线是否已被拔下或插口接触不良
@@ -155,12 +155,14 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 uint8_t msgsize = captured[23];
                 const char *msg = (const char*) &captured[24];
                  if(errtype==0x08)      
-                   exit(0);
+                   {
+                    exit(0);
+                   }
                  else
                  {
-                printf("[%d] Server: Failure.\n", (EAP_ID)captured[19]);
-                if (errtype==0x09 && msgsize>0)
-                {	// 输出错误提示消息
+                  printf("[%d] Server: 认证失败。\n", (EAP_ID)captured[19]);
+                  if (errtype==0x09 && msgsize>0)
+                   {	// 输出错误提示消息
                     fprintf(stderr, "%s\n", msg);
                     // 已知的几种错误如下
                     // E2531:用户名不存在
@@ -171,13 +173,13 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                     // E2602:认证会话不存在
                     // E3137:客户端版本号无效
                     exit(1);
-                }
+                   }
                 
-                else
-                {
+                  else
+                   {
                     printf("errtype=0x%02x\n", errtype);
                     exit(-1);
-                }
+                   }
               }
             }
             else if ((EAP_Code)captured[18] == SUCCESS)
@@ -214,13 +216,21 @@ void GetMacFromDevice(uint8_t mac[6], const char *devicename)
     struct ifreq ifreq;
     sock=socket(AF_INET,SOCK_STREAM,0);
     strcpy(ifreq.ifr_name,devicename);
-    ioctl(sock,SIOCGIFHWADDR,&ifreq);
+    if(ioctl(sock,SIOCGIFHWADDR,&ifreq)==0)
+    {
     mac[0]=(uint8_t)ifreq.ifr_hwaddr.sa_data[0],
     mac[1]=(uint8_t)ifreq.ifr_hwaddr.sa_data[1],
     mac[2]=(uint8_t)ifreq.ifr_hwaddr.sa_data[2],
     mac[3]=(uint8_t)ifreq.ifr_hwaddr.sa_data[3],
     mac[4]=(uint8_t)ifreq.ifr_hwaddr.sa_data[4],
-    mac[5]=(uint8_t)ifreq.ifr_hwaddr.sa_data[5];   
+    mac[5]=(uint8_t)ifreq.ifr_hwaddr.sa_data[5]; 
+    }
+    else
+    {
+     printf("获取MAC地址失败！\n");
+     exit(1);
+    }  
+    close(sock);
 }
 
 static
@@ -374,7 +384,7 @@ void SendLogoffPkt(char *DeviceName)
     packet[16] = packet[17] =0x00;// Length=0x0000
 
     // 发包
-    printf("Logoff.\n");
+    printf("注销成功。\n");
     pcap_sendpacket(adhandle, packet, sizeof(packet));
     exit(0);
 }

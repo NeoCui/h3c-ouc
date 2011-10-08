@@ -16,9 +16,9 @@
 int checkprocess();
 
 void print_help();
-void getuname();
-void getpwd();
-void getdev();
+void getUserName();
+void getPassword();
+void getDevice();
 //主函数
 int main(int argc,char *argv[])
 {
@@ -28,20 +28,20 @@ int main(int argc,char *argv[])
    for(i=0;i<argc;i++)
      {
       for(j=0;j<strlen(argv[i]);j++)
-        if(argv[i][j]=='-')
+        if(argv[i][j]=='-'&&strlen(argv[i])!=1)
           c++;
      }
    if(c<argc/2)
      {
-      printf("参数前面必须有选项！\n请尝试执行“h3c_ouc --help”来获取更多信息。\n");
+      printf("命令行输入错误！\n请尝试执行“h3c_ouc --help”来获取更多信息。\n");
       exit(1);
      }
    struct option long_options[]={
        	{"help",0,NULL,'h'},
-	{"username",1,NULL,'u'},
-	{"password",1,NULL,'p'},
-	{"device",1,NULL,'n'},
-	{"logoff",1,NULL,'l'},       
+	{"username",0,NULL,'u'},
+	{"password",0,NULL,'p'},
+	{"device",0,NULL,'n'},
+	{"logoff",0,NULL,'l'},       
 	{NULL,0,NULL,0},
     };
     static const char *options="u::p::n::l::h";
@@ -58,14 +58,14 @@ int main(int argc,char *argv[])
              case 'u':
              if(checkprocess()==-1)
              {
-              printf("A process is already running!\n");
+              printf("用户已经登录！\n");
               exit(1);
              }
               if(argv[optind]==NULL)
 		  {
-                  getuname();
-                  getpwd();
-                  getdev();
+                  getUserName();
+                  getPassword();
+                  getDevice();
                   }
 	      else
 		  {
@@ -73,7 +73,8 @@ int main(int argc,char *argv[])
                     {
                      username=(char *)malloc(100);
                      strcpy(username,argv[optind]);
-                     getpwd(); getdev();
+                     getPassword(); 
+                     getDevice();
                     }
                   else
                    {
@@ -86,25 +87,25 @@ int main(int argc,char *argv[])
              case 'p':
                 if(checkprocess()==-1)
                 {
-                printf("A process is already running!\n");
+                printf("用户已经登录！\n");
                 exit(1);
                 }
                 if(username==NULL)
                     {
-                    getuname();
-                    getpwd();
-                    getdev();
+                    getUserName();
+                    getPassword();
+                    getDevice();
                     }
                 else if(argv[optind]==NULL)
 		  {
-                    getpwd();
-                    getdev();
+                    getPassword();
+                    getDevice();
                   }
                 else if(argv[optind+1]==NULL)
                    {
                    password=(char *)malloc(100);
                    strcpy(password,argv[optind]);
-                   getdev();
+                   getDevice();
                    }
                 else
                   {
@@ -116,22 +117,22 @@ int main(int argc,char *argv[])
              case 'n':
                if(checkprocess()==-1)
                 {
-                printf("A process is already running!\n");
+                printf("用户已经登录！\n");
                 exit(1);
                 }
                if(username==NULL)
                     {
-                    getuname();
-                    getpwd();
-                    getdev();
+                    getUserName();
+                    getPassword();
+                    getDevice();
                     }
                else if(password==NULL)
                     {
-                    getpwd();
-                    getdev();
+                    getPassword();
+                    getDevice();
                     }
                else if(argv[optind]==NULL)
-                    getdev();
+                    getDevice();
                else
                  {  
                   devicename=(char *)malloc(100); 
@@ -144,13 +145,12 @@ int main(int argc,char *argv[])
               break;
              case 'l':
               if(argv[optind]==NULL)
-		  getdev();
+		  getDevice();
               else
               {
                  devicename=(char *)malloc(100); 
                  strcpy(devicename,argv[optind]);
               }
-              printf("DeviceName:%s.\n",devicename);
               SendLogoffPkt(devicename);
               exit(0);
               break;
@@ -168,7 +168,7 @@ int main(int argc,char *argv[])
 
         } 
     else
-             printf("UserName & Password & DeviceName can not be empty!\n");
+             printf("用户名、密码和网卡名称不能为空！\n");
 
     exit(1);
     
@@ -182,61 +182,58 @@ void print_help()
                 printf("\t-n\t--device\t\t参数为网卡名，默认为'eth0'\n");
 		printf("\t-h\t--help\t\t\t使用方法\n");
      	        printf("\t-l\t--logoff\t\t注销\n");
+                printf("举例:\n");
+                printf("\th3c_ouc -u abc -p 1234 -n eth0\n");
+                printf("\t也可以直接使用 h3c_ouc -u 按照提示输入。\n");
 	}
-void getuname()
+void getUserName()
 {
+     char temp[100];
      username=(char *)malloc(100);
-     GetUname:
-     printf("Please Input UserName:");
-     gets(username);
-     if(strlen(username)==0)
+     GetUserName:
+     printf("请输入用户名：");
+     setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。
+     fgets(temp,sizeof(char)*100,stdin);
+     if(strlen(temp)==0||strlen(temp)==1&&temp[0]=='\n')
         {
-         printf("UserName can't be empty!\n");
-         goto GetUname;
-        }
-     if(strlen(username)>100)
-        {
-         printf("UserName is too long");
-         goto GetUname;
-        }
-}
-void getpwd()
-{
-     GetPwd:
-     printf("Please Input Password:");
-     password=(char *)malloc(100);
-     gets(password);
-     if(strlen(password)==0)
-         {
-         printf("Password can't be empty!\n");
-         goto GetPwd;
-         }
-      if(strlen(password)>100)
-        {
-         printf("UserName is too long");
-         goto GetPwd;
-        }
-}
-
-void getdev()
-{
-  char *temp;  
-     GetDeviceName:      
-     temp=(char *)malloc(100);
-     devicename=(char *)malloc(100);
-     printf("Please Input DeviceName(default for eth0):");
-     gets(temp);
-     if(strlen(temp)==0)
-        strcpy(devicename,DefaultDevName);
-     else if(strlen(temp)!=4)
-        {
-         printf("DeviceName Error!\n");
-         goto GetDeviceName;
+         printf("用户名不能为空！\n");
+         goto GetUserName;
         }
      else
+         memcpy(username,temp,strlen(temp)-1);
+}
+void getPassword()
+{
+     char temp[100];
+     password=(char *)malloc(100);
+     GetPassword:
+     printf("请输入密码：");
+     setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。
+     fgets(temp,sizeof(char)*100,stdin);
+     if(strlen(temp)==0||strlen(temp)==1&&temp[0]=='\n')
+         {
+         printf("密码不能为空！\n");
+         goto GetPassword;
+         }
+     else
+         memcpy(password,temp,strlen(temp)-1);
+}
+
+void getDevice()
+{
+     char *temp;  
+     temp=(char *)malloc(100);
+     devicename=(char *)malloc(100);
+     GetDeviceName:      
+     printf("请输入网卡名称（默认为eth0）：");
+     setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。
+     fgets(temp,sizeof(char)*100,stdin);
+     if(strlen(temp)==0||strlen(temp)==1&&temp[0]=='\n')
         {
-         strcpy(devicename,temp);
+         strcpy(devicename,DefaultDevName);
         }
+     else
+         memcpy(devicename,temp,strlen(temp)-1);
 }
 
 int checkprocess()
