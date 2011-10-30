@@ -1,3 +1,7 @@
+2011-11-30 Jiakun Huang <huangjiakun1991@gmail.com>  Luji Cui <cuiluji@126.com>
+	*完成GUI测试版
+	*在GUI版中添加二次认证功能
+
 2011-10-08 Jiakun Huang <huangjiakun1991@gmail.com>
 	*输出信息全部改成中文
 	*增加socket()函数的空间释放
