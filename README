@@ -18,15 +18,15 @@ Ubuntu 10.10
 $ sudo apt-get install libpcap-dev
 $ sudo apt-get install libgcrypt-dev
 
-cli
+CLI
 
 编译：
 $ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
 $ cd /path/to/h3c-ouc/
-$ make cli
+$ make CLI
 
 安装：
-$ sudo make install cli
+$ sudo make install CLI
 
 GUI
 
@@ -41,7 +41,7 @@ $ sudo make install GUI
 
 USAGE
 =====
-cli
+CLI
 规则：h3c_ouc -u [用户名] -p [密码] -d [网卡名称]
 使用 h3c_ouc -u 按照提示输入。
 使用 h3c_ouc -l [网卡名称] 注销登录。
@@ -55,8 +55,8 @@ UNINSTALLATION
 ==============
 $ cd /path/to/h3c-ouc/
 
-cli
-$ make uninstall cli
+CLI
+$ make uninstall CLI
 
 GUI
 $ make uninstall GUI

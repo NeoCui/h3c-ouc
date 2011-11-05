@@ -4,13 +4,13 @@
 import wx
 import time
 import threading
-import subprocess,sys,urllib,httplib
+import subprocess,sys,urllib,httplib,os
 
-devicename = 'eth0'
+devicename = ''
 statusbar = None
-tc = None
+tc = None #声明全局变量devicename,statusbar,tc
 
-#Set the Statusbar.
+#状态栏定义
 class MyStatusBar(wx.StatusBar):
     def __init__(self,parent):
         wx.StatusBar.__init__(self,parent)
@@ -21,25 +21,25 @@ class MyStatusBar(wx.StatusBar):
 	self.SetStatusText(time.strftime("%I:%M:%S",time.localtime(time.time())),1)
 	self.timer = wx.Timer(self)
 	self.Bind(wx.EVT_TIMER,self.OnTimer,self.timer)
-	self.timer.Start(1000)
+	self.timer.Start(1000) #状态栏初始化
 
     def Draw(self, dc):
         t = time.localtime(time.time())
         st = time.strftime("%I:%M:%S", t)
 	self.SetStatusText(st,1)
 	self.SetFieldsCount(2)
-	self.SetStatusWidths([-5,-2])
+	self.SetStatusWidths([-5,-2]) #状态栏任务划分
 	
 
     def OnTimer(self,evt):
 	dc = wx.BufferedDC(wx.ClientDC(self))
-	self.Draw(dc)
+	self.Draw(dc) #状态栏显示时间函数
    
     def OnPaint(self, evt):
         dc = wx.BufferedPaintDC(self)
-        self.Draw(dc)
+        self.Draw(dc) #状态栏刷新
         
-#Set the Taskbar.
+#任务栏定义
 class TaskBarIcon(wx.TaskBarIcon):
     ID_Bar = wx.NewId()
     def __init__(self, frame):
@@ -47,13 +47,13 @@ class TaskBarIcon(wx.TaskBarIcon):
         self.frame = frame
         self.SetIcon(wx.Icon(name='disconnected.png', type=wx.BITMAP_TYPE_PNG), 'TaskBarIcon!')
         self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.OnLeftDown)
-	self.Bind(wx.EVT_TASKBAR_RIGHT_DOWN, self.OnRightDown)
+	self.Bind(wx.EVT_TASKBAR_RIGHT_DOWN, self.OnRightDown) #任务栏初始化
 
     def OnLeftDown(self, event):
         if self.frame.Show():
 		self.frame.Show(True)
 	else:
-		self.frame.Show(False)
+		self.frame.Show(False) #任务栏左键定义为最小化动作
         
     def OnRightDown(self, event):
 	if not hasattr(self, "popupID1"):
@@ -65,7 +65,7 @@ class TaskBarIcon(wx.TaskBarIcon):
         menu.Append(self.popupID1, "Exit")
 	menu.Append(self.popupID2, "Disconnect")
         self.PopupMenu(menu)
-        menu.Destroy()
+        menu.Destroy() #任务栏右键动作显示Exit和Disconnect
 
     def OnPopupOne(self, event):
 	global devicename
@@ -77,7 +77,7 @@ class TaskBarIcon(wx.TaskBarIcon):
 		self.frame.Destroy()
 	else:
 		pass
-	dlg.Destroy()
+	dlg.Destroy() #定义任务栏右键Exit动作
 	
     def OnPopupTwo(self, event):
 	global devicename
@@ -87,11 +87,12 @@ class TaskBarIcon(wx.TaskBarIcon):
 	out=p.stdout.read()
         tc.AppendText(out)
 	statusbar.SetStatusText('Disconnected.')
-	self.SetIcon(wx.Icon(name='disconnected.png', type=wx.BITMAP_TYPE_PNG))
+	self.SetIcon(wx.Icon(name='disconnected.png', type=wx.BITMAP_TYPE_PNG)) #定义任务栏右键Disconnect动作
 
+#主窗口定义
 username = ''
 password = ''
-state = False
+state = False #声明全局变量
 class MyFrame(wx.Frame):
     def __init__(self,parent,id,title):
 	self.cfg = wx.Config('myconfig')
@@ -104,6 +105,7 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self,parent,id,title,size=(420,480),style=wx.DEFAULT_FRAME_STYLE)
 	global statusbar
 	global tc
+	global devicename				
 	self.taskBarIcon = TaskBarIcon(self)
 	statusbar = MyStatusBar(self)
         self.SetStatusBar(statusbar)
@@ -137,8 +139,11 @@ class MyFrame(wx.Frame):
 
         self.UserName = wx.TextCtrl(panel1,-1,str(username),style=wx.TE_PROCESS_ENTER)
         self.Password = wx.TextCtrl(panel1,-1,str(password),style=wx.TE_PASSWORD)
-	self.author = ['eth0','lo']
-	self.choice = wx.Choice(panel1, -1,choices=['eth0','lo'], style=wx.CB_READONLY)
+	self.authors = []
+	self.InitDevicename()
+	self.choice = wx.ComboBox(panel1, -1,choices=self.authors, style=wx.CB_READONLY)
+	self.choice.SetSelection(0)
+	devicename = self.authors[0]
 	self.rp = wx.CheckBox(panel1,2,'Remember Password')
 	self.rp.SetValue(state)
 	tc = wx.TextCtrl(panel3, -1, style=wx.TE_MULTILINE | wx.TE_READONLY)
@@ -169,10 +174,22 @@ class MyFrame(wx.Frame):
 
         hbox.Add(vbox1, 1, wx.EXPAND)
         self.SetSizer(hbox)
-        self.Centre()
+        self.Centre() #主窗口初始化，包括主窗口组件构成及响应动作
 
-    def OnSelect(self, event):			      
-	item = event.GetSelection()
+    def InitDevicename(self):
+	p=os.popen("ifconfig -s|awk '{print $1}'")
+	name=p.readline()
+	while True:
+		name=p.readline().strip()
+		if name=='' :
+			break
+		else :
+			self.authors.append(name)
+
+
+    def OnSelect(self, event):
+	global devicename		      
+	devicename = self.authors[event.GetSelection()] #网卡选择函数
 
     def OnQuit(self, event):
 	global devicename
@@ -184,13 +201,13 @@ class MyFrame(wx.Frame):
 		self.Destroy() 
 	else:
 		pass
-	dlg.Destroy()    
+	dlg.Destroy() #定义主窗口菜单栏退出动作
 
     def OnAbout(self, event):
-	text = 'This is a Net connection program.\nThank you for your usage.\nUpdate on http://www.ouc.edu.cn\nCopyright(c)Ocean University of China'
+	text = 'This is a Net connection program.\nThank you for your usage.\nUpdate on http://code.google.com/p/h3c-ouc/\nCopyright(c)Ocean University of China'
         dlg = wx.MessageDialog(self, text, 'About',wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
-        dlg.Destroy()
+        dlg.Destroy() #定义主窗口菜单栏帮助动作
 
     def RePassword(self, event):
 	if self.rp.GetValue():
@@ -200,35 +217,34 @@ class MyFrame(wx.Frame):
 	else:
 		self.cfg.Write("username", '')
 		self.cfg.Write("password", '')
-		self.cfg.WriteBool("state",False)
+		self.cfg.WriteBool("state",False) #定义主窗口记住密码动作
 
-    def OnConnect(self, event):			#Connect the Internet.	
+    def OnConnect(self, event):	
 	global devicename	
 	username = self.UserName.GetValue()
        	password = self.Password.GetValue()
-	devicename = self.author[self.choice.GetSelection()]
         cli=ThreadCli(username,password,devicename,self)
 	cli.setDaemon(True)
-	cli.start()
+	cli.start() #定义主窗口网络连接动作
 
-    def OnDisConnect(self,event):		#Disconnect the Internet.
+    def OnDisConnect(self,event):
 	global devicename
 	p=subprocess.Popen(['./h3c_ouc','-l',devicename],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
 	out=p.stdout.readline()
 	self.Display(out)
-	self.DDisplay()
+	self.DDisplay() #定义主窗口网络注销动作
 
     def Display(self,msg):
-        tc.AppendText(msg)
+        tc.AppendText(msg) #定义主窗口程序运行进程显示栏
 
     def CDisplay(self):
 	statusbar.SetStatusText('Connected.')
-        self.taskBarIcon.SetIcon(wx.Icon(name='connected.png', type=wx.BITMAP_TYPE_PNG))
+        self.taskBarIcon.SetIcon(wx.Icon(name='connected.png', type=wx.BITMAP_TYPE_PNG)) #定义连接成功时任务栏图标显示
+
     def DDisplay(self):
 	statusbar.SetStatusText('Disconnected.')
-        self.taskBarIcon.SetIcon(wx.Icon(name='disconnected.png', type=wx.BITMAP_TYPE_PNG))
+        self.taskBarIcon.SetIcon(wx.Icon(name='disconnected.png', type=wx.BITMAP_TYPE_PNG)) #定义连接失败时任务栏图标显示
 
-    #二次认证
     def Twice(self,username,password):
 	count=0
 	while True :
@@ -253,24 +269,25 @@ class MyFrame(wx.Frame):
 					break
 			except Exception :
 				count=count+1
-				time.sleep(1)
-    	
+				time.sleep(1) #定义二次认证函数
+
+#定义CLI与GUI实现通信
 class ThreadCli(threading.Thread):
 	def __init__(self,username,password,devicename,window):
 		threading.Thread.__init__(self)
 		self.username=username
 		self.password=password
 		self.devicename=devicename
-		self.window=window
+		self.window=window #初始化
+
 	def run(self):
-		global flag
 		p=subprocess.Popen(['./h3c_ouc','-u',self.username,'-p',self.password,'-n',self.devicename],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
 		while True:
 			out = p.stdout.readline()
 			if out == '' and p.poll() != None:
 				break
 			if out!= '':
-				if out == "success\n" :
+				if out == "认证成功。\n" :
 					wx.CallAfter(self.window.Display,"认证成功。\n")
 					wx.CallAfter(self.window.CDisplay)
 					wx.CallAfter(self.window.Display,"正在登录到 172.16.18.4 服务器......\n")
@@ -280,7 +297,7 @@ class ThreadCli(threading.Thread):
 					wx.CallAfter(self.window.DDisplay)
 		if p.returncode == 2:
 			wx.CallAfter(self.window.Display,out)
-			wx.CallAfter(self.window.CDisplay)	
+			wx.CallAfter(self.window.CDisplay) #通过subprocess模块实现主窗口连接动作与CLI版命令行连接
 				
 class MyApp(wx.App):
     def OnInit(self):
@@ -288,10 +305,10 @@ class MyApp(wx.App):
         frame.Show(True)
         return True
 
-def main():					#Main function.
+def main():
     app = MyApp(0)
     app.MainLoop()
     
 if __name__ == '__main__':
 
-    main()
+    main() #实现图形化界面显示

@@ -17,7 +17,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
     struct bpf_program	fcode;
     const int DefaultTimeout=1000;//设置接收超时参数，单位ms
 
-    // 检查网线是否已插好,网线插口可能接触不良
+     //检查网线是否已插好,网线插口可能接触不良
     if(GetNetState(DeviceName)==-1)
        {
        fprintf(stderr, "%s\n", "网卡异常！请检查网卡名称是否正确，网线是否插好！");
@@ -27,7 +27,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
     adhandle = pcap_open_live(DeviceName,65536,1,DefaultTimeout,errbuf);
     if (adhandle==NULL) {
         fprintf(stderr, "%s\n", errbuf);
-        exit(-1);
+        exit(1);
     }
    
      
@@ -65,12 +65,12 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                 serverIsFound = true;
             else
             {	// 延时后重试
-                printf("等待服务器响应......\n");
-                if(flag>3)
+		if(flag>3)
                    {
-                   printf("服务器未响应。\n");
+                   fprintf(stderr, "%s\n", "服务器未响应。");
                    exit(1);
                    }
+                fprintf(stderr, "%s\n", "等待服务器响应......");
                 sleep(1); 
                 flag++;
                 SendStartPkt(adhandle, MAC);
@@ -178,24 +178,30 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
                   else
                    {
                     printf("errtype=0x%02x\n", errtype);
-                    exit(-1);
+                    exit(1);
                    }
               }
             }
             else if ((EAP_Code)captured[18] == SUCCESS)
             {
-
+		 char cmd[30];
+		 strcpy(cmd,"dhclient ");
+		 strcat(cmd,DeviceName);
+		 system(cmd);
                  pid_t pid;
                  pid=fork();
                    if(pid<0)
                       exit(1); 
                   else if(pid==0)
                      {
-                        printf("Pass authentication.\n");
                         goto LOOP;  
                      }
                   else
-                     exit(0);    
+		    {
+			printf("认证成功。\n");
+		     //fprintf(stderr,"%s\n","success");
+                        exit(0);    
+		    }
             }
             else
             {
@@ -205,7 +211,7 @@ int Authentication(char *UserName,char *Password,char *DeviceName)
         }
        }
     }
-    return (0);
+    return 0;
 }
 
 
@@ -368,7 +374,7 @@ void SendLogoffPkt(char *DeviceName)
     adhandle = pcap_open_live(DeviceName,65536,1,DefaultTimeout,errbuf);
     if (adhandle==NULL) {
         fprintf(stderr, "%s\n", errbuf);
-        exit(-1);
+        exit(1);
     }
     
     GetMacFromDevice(MAC, DeviceName);
@@ -480,7 +486,7 @@ int GetNetState(char *devicename)
     int     chars_read;
     int     ret;
     char    command[100];
-    strcpy(command,"ifconfig ");
+    strcpy(command,"sudo ifconfig ");
     strcat(command,devicename);
     strcat(command," |grep RUNNING");
     memset( buffer, 0, BUFSIZ );
