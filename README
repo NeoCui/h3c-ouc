@@ -18,7 +18,7 @@ Ubuntu 10.10
 $ sudo apt-get install libpcap-dev
 $ sudo apt-get install libgcrypt-dev
 
-CLI
+==CLI==
 
 编译：
 $ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
@@ -26,9 +26,9 @@ $ cd /path/to/h3c-ouc/
 $ make CLI
 
 安装：
-$ sudo make install CLI
+$ sudo make install-CLI
 
-GUI
+==GUI==
 
 编译：
 $ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
@@ -36,27 +36,41 @@ $ cd /path/to/h3c-ouc/
 $ make GUI
 
 安装：
-$ sudo make install GUI
+$ sudo make install-GUI
+
+==ALL==
+包括CLI和GUI
+
+编译：
+$ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
+$ cd /path/to/h3c-ouc/
+$ make
+
+安装：
+$ sudo make install
 
 
 USAGE
 =====
-CLI
+==CLI==
 规则：h3c_ouc -u [用户名] -p [密码] -d [网卡名称]
 使用 h3c_ouc -u 按照提示输入。
 使用 h3c_ouc -l [网卡名称] 注销登录。
 使用 h3c_ouc --help 来查看详细帮助。 
 目前认证完后需要在网页进行二次登录，不需要二次认证的功能正在开发中。 
 
-GUI
+==GUI==
 参照界面的提示执行。
 
 UNINSTALLATION
 ==============
 $ cd /path/to/h3c-ouc/
 
-CLI
-$ make uninstall CLI
+==CLI==
+$ make uninstall-CLI
 
-GUI
-$ make uninstall GUI
+==GUI==
+$ make uninstall-GUI
+
+==ALL==
+$ make uninstall

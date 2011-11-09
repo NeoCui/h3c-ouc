@@ -1,19 +1,4 @@
-DESUDIR = /usr/bin/
-CONFDIR = /usr/share/gh3c/
-DSKTDIR = /usr/share/applications/
-GCC=gcc
-RM=rm -f
-INSTALL=install
-
 BIN=h3c_ouc
-OBJS=h3c_ouc.o authenticate.o
-CFLAGS=-lpcap -lgcrypt
-
-$(BIN): $(OBJS)
-	$(GCC) $(CFLAGS) $(OBJS) -o  $@
-
-%.o: %.c
-	$(GCC) $(CFLAGS) -c $<
 
 .PHONY: clean install uninstall
 
@@ -37,7 +22,6 @@ uninstall:
 	$(RM) $(CONFDIR)g-h3c_ouc.py
 	$(RM) $(DESUDIR)h3c
 	$(RM) $(DSKTDIR)H3C.desktop
-	
-clean:
-	$(RM) $(OBJS) $(BIN)
 
+clean:
+	$(RM) $(BIN)

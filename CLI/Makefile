@@ -1,7 +1,3 @@
-GCC=gcc
-RM=rm -f
-INSTALL=install
-
 BIN=h3c_ouc
 OBJS=h3c_ouc.o authenticate.o
 CFLAGS=-lpcap -lgcrypt
@@ -23,4 +19,3 @@ uninstall:
 
 clean:
 	$(RM) $(OBJS) $(BIN)
-
