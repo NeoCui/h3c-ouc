@@ -54,6 +54,7 @@ $ sudo make install
 
 USAGE
 =====
+运行需要root权限。
 ==CLI==
 规则：h3c_ouc -u [用户名] -p [密码] -d [网卡名称]
 使用 h3c_ouc -u 按照提示输入。

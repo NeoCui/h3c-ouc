@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
+#include <errno.h>
+#define ECHOFLAGS (ECHO | ECHOE | ECHOK | ECHONL)
 
    const char DefaultDevName[]="eth0";
    char *username;
@@ -13,7 +16,8 @@
 
 //检测进程
 int checkprocess();
-
+//控制密码回显
+int set_disp_mode(int fd,int option);
 void print_help();
 void getUserName();
 void getPassword();
@@ -162,6 +166,7 @@ int main(int argc,char *argv[])
        
     if((strlen(username)!=0)&&(strlen(password)!=0)&&(strlen(devicename)!=0))
         {
+		printf("%s %s %s\n",username,password,devicename);
 		Authentication(username,password,devicename);
         } 
     else
@@ -189,7 +194,7 @@ void getUserName()
      username=(char *)malloc(100);
      GetUserName:
      printf("请输入用户名：");
-     setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。
+     setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。 
      fgets(temp,sizeof(char)*100,stdin);
      if(strlen(temp)==0||strlen(temp)==1&&temp[0]=='\n')
         {
@@ -201,12 +206,16 @@ void getUserName()
 }
 void getPassword()
 {
-     char temp[100];
+     char c,temp[100];
      password=(char *)malloc(100);
      GetPassword:
      printf("请输入密码：");
      setbuf(stdin,NULL);                           //清除缓冲区(Linux),Windows下可以使用fflush或者rewind。
+     
+     //关闭回显
+     set_disp_mode(STDIN_FILENO,0);
      fgets(temp,sizeof(char)*100,stdin);
+     printf("\n");
      if(strlen(temp)==0||strlen(temp)==1&&temp[0]=='\n')
          {
          printf("密码不能为空！\n");
@@ -214,6 +223,7 @@ void getPassword()
          }
      else
          memcpy(password,temp,strlen(temp)-1);
+         set_disp_mode(STDIN_FILENO,1);
 }
 
 void getDevice()
@@ -231,6 +241,27 @@ void getDevice()
         }
      else
          memcpy(devicename,temp,strlen(temp)-1);
+}
+
+int set_disp_mode(int fd,int option)
+
+{
+   int err;
+   struct termios term;
+   if(tcgetattr(fd,&term)==-1){
+     perror("Cannot get the attribution of the terminal");
+     return 1;
+   }
+   if(option)
+       term.c_lflag|=ECHOFLAGS;
+   else
+        term.c_lflag &=~ECHOFLAGS;
+   err=tcsetattr(fd,TCSAFLUSH,&term);
+   if(err==-1 && err==EINTR){
+        perror("Cannot set the attribution of the terminal");
+        return 1;
+   }
+   return 0;
 }
 
 int checkprocess()
