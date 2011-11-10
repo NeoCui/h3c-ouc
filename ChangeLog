@@ -1,3 +1,6 @@
+2011-11-10 Haiyong Zheng <zhenghaiyong@gmail.com>
+	*添加总控Makefile
+
 2011-11-30 Jiakun Huang <huangjiakun1991@gmail.com>  Luji Cui <cuiluji@126.com>
 	*完成GUI测试版
 	*在GUI版中添加二次认证功能

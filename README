@@ -14,11 +14,10 @@ INSTALLATION
 ============
 Ubuntu 10.10
 
+==CLI==
 安装依赖库 libpcap 和 libgcrypt：
 $ sudo apt-get install libpcap-dev
 $ sudo apt-get install libgcrypt-dev
-
-==CLI==
 
 编译：
 $ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
@@ -29,7 +28,10 @@ $ make CLI
 $ sudo make install-CLI
 
 ==GUI==
-
+运行需要Pyhton环境，Linux系统一般默认安装Python。 依赖模块wxPython:
+sudo apt-get install python-wxtools
+或者下载源代码安装，网址：http://www.wxpython.org/download.php#stable。
+ 
 编译：
 $ tar xvfz /path/to/h3c-ouc-x.x.tar.gz
 $ cd /path/to/h3c-ouc/
