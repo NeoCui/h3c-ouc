@@ -20,6 +20,7 @@ uninstall:
 	$(RM) $(CONFDIR)connected.png
 	$(RM) $(CONFDIR)disconnected.png
 	$(RM) $(CONFDIR)g-h3c_ouc.py
+	$(RM) $(CONFDIR)h3c_ouc
 	$(RM) $(DESUDIR)h3c
 	$(RM) $(DSKTDIR)H3C.desktop
 

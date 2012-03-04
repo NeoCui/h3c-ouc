@@ -1,6 +1,6 @@
 README
 ======
-h3c-ouc 是适用于中国海洋大学宿舍区的 h3c UNIX/Linux 下上网客户端，主要依赖 libpcap 和 libgcrypt  库。我们的目的就是通过研究学习 h3c 802.1x 上网认证系统的协议和认证机制，开发 UNIX/Linux 下上网客户端，并方便 UNIX/Linux 用户上网。目前的版本支持 CLI（Command Line Interface）方式和GUI（Graphical User Interface）方式，其中GUI方式中带有二次认证，CLI方式的二次认证正在开发中。 
+h3c-ouc 是适用于中国海洋大学宿舍区的 h3c UNIX/Linux 下上网客户端，主要依赖 libpcap 和 libgcrypt 库。
 
 CONTACT
 =======
